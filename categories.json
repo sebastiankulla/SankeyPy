@@ -1,0 +1,115 @@
+{
+  "Car:Fuel": [
+    "Aral",
+    "Bp"
+  ],
+  "Car:Financing": [
+    "VW-Bank"
+  ],
+  "Car:Tickets": [
+    "Ordnungsamt",
+    "Stadt Kassel",
+    "Bundeskasse"
+  ],
+  "Car:Insurance": [
+    "HUK-Coburg"
+  ],
+  "Lifestyle:Netflix": [
+    "Netflix"
+  ],
+  "Lifestyle:Spotify": [
+    "Spotify"
+  ],
+  "Housing:Apartment Rent": [
+    "Wohnunsgsmiete",
+    "Miete"
+  ],
+  "Housing:Internet": [
+    "Unitymedia"
+  ],
+  "Housing:Furniture": [
+    "Porta",
+    "Ikea"
+  ],
+  "Housing:Radio Fee": [
+    "Rundfunk"
+  ],
+  "Housing:Gas, Water & Electricity": [
+    "Stadtwerke",
+    "E.ON Energie"
+  ],
+  "Housing:Post": [
+    "Caya"
+  ],
+  "Insurances": [
+    "Versicherung",
+    "Techniker Krankenkasse",
+    "DEVK"
+  ],
+  "Lifestyle:Vacation": [
+    "Urlaub"
+  ],
+  "Lifestyle:Shopping": [
+    "Amazon",
+    "Otto GmbH",
+    "Kik Textilien",
+    "Paypal",
+    "Saturn",
+    "Media Markt"
+  ],
+  "Cashback": [
+    "Couponing",
+    "Brunel"
+  ],
+  "Salary": [
+    "Fraunhofer",
+    "Brunel"
+  ],
+  "Lifestyle:Cash": [
+    "Geldautomat",
+    "Auszahlung",
+    "Bargeldeinzahlung"
+  ],
+  "Lifestyle:Groceries": [
+    "Lidl",
+    "Edeka",
+    "Rewe",
+    "Aldi",
+    "Tegut"
+  ],
+  "Lifestyle:Dining": [
+    "Restaurant",
+    "Pizzeria"
+  ],
+  "Lifestyle:Phone Bill": [
+    "Telefonica",
+    "Drillisch"
+  ],
+  "Savings": [
+    "WPKNR",
+    "Traderepublic",
+    "MSCI IT",
+    "Kaution",
+    "Wertpapierkauf",
+    "Fidor"
+  ],
+  "Car:Leasing": [
+    "Volkswagen AG"
+  ],
+  "Lifestyle:Hobby": [
+    "McFit"
+  ],
+  "Lifestyle:Credit Card": [
+    "Visa",
+    "Mastercard"
+  ],
+  "Parents": [
+    "Norbert Kulla",
+    "Carmen Konigs-Kulla",
+    "Kulla, Norbert"
+  ],
+  "Lifestyle:Drugstore": [
+    "Rossmann",
+    "Drogerie"
+  ]
+}
