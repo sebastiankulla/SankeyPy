@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 
-class Account:
+class Account:  # Todo make it possible to merge multiple accounts (checking account, credit card, Paypal) for better categorization
     def __init__(self):
         self.old_account_balance = 0
         self.new_account_balance = 0
@@ -13,7 +13,7 @@ class Account:
     def load_revenue(self, revenue_file):
         raise NotImplementedError
 
-    def categorize(self, category_json_file):
+    def categorize(self, category_json_file): # Todo make it possible to difference the columns booking_text and client for better categorization
         with open(category_json_file, 'r') as json_file:
             categories = json.load(json_file)
         self.revenue.loc[self.revenue.turnover > 0, 'category'] = 'Other Income'
@@ -36,7 +36,7 @@ class Account:
 
 class ComdirectAccount(Account):
     def __init__(self):
-        super(Comdirect, self).__init__()
+        super(ComdirectAccount, self).__init__()
 
     def _convert_dates(self, date_string):
         return datetime.strptime(date_string, r'%d.%m.%Y')
@@ -44,7 +44,7 @@ class ComdirectAccount(Account):
     def _convert_turnover(self, string):
         return np.float(string.replace('.', '').replace(',', '.'))
 
-    def load_revenue(self, revenue_file):
+    def load_revenue(self, revenue_file):  # Todo Try to seperate the client from column booking_text, add new column for client
         usecols = [0, 1, 2, 3, 4]
         names = ['booking_date', 'value_date', 'procedure', 'booking_text', 'turnover']
         converters = {'booking_date': self._convert_dates, 'value_date': self._convert_dates,
@@ -54,7 +54,7 @@ class ComdirectAccount(Account):
         self.revenue = pd.read_csv(revenue_file, **kwargs)
 
 
-class INGAccount(Account):
+class INGAccount(Account): #  Todo add load_revenue method for INGAccount
     def __init__(self):
         super(INGAccount, self).__init__()
 

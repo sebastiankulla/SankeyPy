@@ -8,6 +8,7 @@ class SankeyPlot:
         self.target = []
         self.value = []
 
+
         grouped_cash_flow.reset_index(inplace=True)
         grouped_cash_flow.loc[grouped_cash_flow.turnover >= 0, 'category'] = grouped_cash_flow.category + ':Budget'
         grouped_cash_flow.loc[grouped_cash_flow.turnover < 0, 'category'] = 'Budget:' + grouped_cash_flow.category

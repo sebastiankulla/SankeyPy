@@ -111,7 +111,7 @@ def create_sankey_plot(n_clicks, filename, name_bank, name_plot, start_date, sto
             raise NotImplementedError(str(name_bank) + 'is not Implemented')
 
         my_account.load_revenue(filename)
-        my_account.categorize()
+        my_account.categorize('categories.json')  # Todo extend the dash interface so that the categories can be set in it
 
         if name_plot == 'SKEY':
             my_plot = SankeyPlot(my_account.get_grouped_cashflow_period(start_date, stop_date, method))
