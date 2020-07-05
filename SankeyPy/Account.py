@@ -24,26 +24,19 @@ class Account:
                 self.revenue.loc[
                     self.revenue['booking_text'].str.lower().str.contains(keyword.lower()), 'category'] = category
 
-    @property
-    def grouped_cash_flow(self):
-        return self.revenue[['category', 'turnover']].groupby('category').sum()
-
-    @property
-    def grouped_cash_flow_month(self):
-        return self.grouped_cash_flow / self.timeperiod_month
-
-    @property
-    def timeperiod_days(self):
-        return (self.revenue.booking_date.iloc[0] - self.revenue.booking_date.iloc[-1]).days
-
-    @property
-    def timeperiod_month(self):
-        return self.timeperiod_days / 30.436875
+    def get_grouped_cashflow_period(self, start_date, stop_date, method=None):
+        period_df = self.revenue[(self.revenue.booking_date > start_date) & (self.revenue.booking_date < stop_date)]
+        timeperiod_month = (period_df.booking_date.iloc[0] - period_df.booking_date.iloc[-1]).days / 30.436875
+        sum_by_category = period_df[['category', 'turnover']].groupby('category').sum()
+        if method == 'AVG':
+            return sum_by_category / timeperiod_month
+        else:
+            return sum_by_category
 
 
 class ComdirectAccount(Account):
     def __init__(self):
-        super(ComdirectAccount, self).__init__()
+        super(Comdirect, self).__init__()
 
     def _convert_dates(self, date_string):
         return datetime.strptime(date_string, r'%d.%m.%Y')
