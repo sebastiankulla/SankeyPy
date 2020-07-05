@@ -35,8 +35,12 @@ class SankeyPlot:
             self.target.append(self.label.index(key.split(':')[1]))
             self.value.append(abs(value))
 
-    def plot(self):
-        fig = go.Figure(data=[go.Sankey(
+    @property
+    def fig(self):
+        fig = go.Figure(
+            layout = dict(height=1000
+                          ),
+            data=[go.Sankey(
             arrangement='perpendicular',
             valuesuffix='€',
             valueformat=".2f",
@@ -52,6 +56,5 @@ class SankeyPlot:
                 target=self.target,
                 value=self.value
             ))])
-
         fig.update_layout(title_text="Basic Sankey Diagram", font_size=10)
-        fig.show()
+        return fig
