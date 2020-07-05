@@ -54,3 +54,9 @@ class ComdirectAccount(Account):
         self.revenue = pd.read_csv(revenue_file, **kwargs)
 
 
+class INGAccount(Account):
+    def __init__(self):
+        super(INGAccount, self).__init__()
+
+    def load_revenue(self, revenue_file):
+        raise NotImplementedError
