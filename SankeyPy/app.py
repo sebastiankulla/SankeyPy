@@ -104,7 +104,12 @@ def file_chosen(filename):
      dash.dependencies.State('date-picker-range', 'end_date'),
      dash.dependencies.State('avg-checklist', 'value')])
 def create_sankey_plot(n_clicks, filename, name_bank, name_plot, start_date, stop_date, method):
-    if all([arg is not None for arg in [n_clicks, filename, name_bank, start_date, stop_date]]):
+    if all([arg is not None for arg in [n_clicks, filename, name_bank, start_date, stop_date, method]]):
+        if 'AVG' in method:
+            avg_values = True
+        else:
+            avg_values = False
+
         if name_bank == 'CDT':
             my_account = ComdirectAccount()
         else:
@@ -114,7 +119,7 @@ def create_sankey_plot(n_clicks, filename, name_bank, name_plot, start_date, sto
         my_account.categorize('categories.json')  # Todo extend the dash interface so that the categories can be set in it
 
         if name_plot == 'SKEY':
-            my_plot = SankeyPlot(my_account.get_grouped_cashflow_period(start_date, stop_date, method))
+            my_plot = SankeyPlot(my_account.get_grouped_cashflow_period(start_date, stop_date, avg_values=avg_values))
         else:
             raise NotImplementedError(str(name_plot) + 'is not Implemented')
 

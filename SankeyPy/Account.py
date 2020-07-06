@@ -24,11 +24,11 @@ class Account:  # Todo make it possible to merge multiple accounts (checking acc
                 self.revenue.loc[
                     self.revenue['booking_text'].str.lower().str.contains(keyword.lower()), 'category'] = category
 
-    def get_grouped_cashflow_period(self, start_date, stop_date, method=None):
+    def get_grouped_cashflow_period(self, start_date, stop_date, avg_values=True):
         period_df = self.revenue[(self.revenue.booking_date > start_date) & (self.revenue.booking_date < stop_date)]
         timeperiod_month = (period_df.booking_date.iloc[0] - period_df.booking_date.iloc[-1]).days / 30.436875
         sum_by_category = period_df[['category', 'turnover']].groupby('category').sum()
-        if method == 'AVG':
+        if avg_values:
             return sum_by_category / timeperiod_month
         else:
             return sum_by_category
