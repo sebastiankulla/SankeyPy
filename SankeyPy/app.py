@@ -1,80 +1,99 @@
+import base64
+import uuid
+import webbrowser
+from datetime import datetime, timedelta
+from threading import Timer
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from datetime import datetime, timedelta
-from SankeyPy.Account import ComdirectAccount
-from SankeyPy.Plots import SankeyPlot, BarPlotMonthly, BarPlotDaily
-import webbrowser
-from threading import Timer
+import pandas as pd
+from dash.dependencies import State, Input, Output
 from dash.exceptions import PreventUpdate
+from flask_caching import Cache
+
+from SankeyPy.Account import ComdirectAccount
+from SankeyPy.Plots import SankeyPlot, BarPlotMonthly
 
 app = dash.Dash(__name__)
+cache = Cache(app.server, config={
+    'CACHE_TYPE': 'filesystem',
+    'CACHE_DIR': 'cache-directory'
+})
+
 app.sankeyplot = None
 
-app.layout = html.Div([
 
-    html.Div([
+def serve_layout():
+    session_id = str(uuid.uuid4())
+
+    return html.Div([
         html.Div([
-            html.Label('Select your revenue export'),
-            dcc.Upload(
-                id='upload-data',
-                children=html.Div([
-                    'drag and drop or ',
-                    html.A('select files')
-                ]),
-                style={
-                    'height': '60px',
-                    'lineHeight': '60px',
-                    'borderWidth': '1px',
-                    'borderStyle': 'dashed',
-                    'borderRadius': '5px',
-                    'textAlign': 'center',
-                    'margin': '10px'
-                },
-                className="dcc_control"),
+            html.Div([
+                html.Label('Select your revenue export'),
+                dcc.Upload(
+                    id='upload-data',
+                    children=html.Div([
+                        'drag and drop or ',
+                        html.A('select files')
+                    ]),
+                    style={
+                        'height': '60px',
+                        'lineHeight': '60px',
+                        'borderWidth': '1px',
+                        'borderStyle': 'dashed',
+                        'borderRadius': '5px',
+                        'textAlign': 'center',
+                        'margin': '10px'
+                    },
+                    className="dcc_control"),
 
-            html.Label('Name of the bank'),
-            dcc.Dropdown(
-                id='bank-dropdown',
-                options=[
-                    {'label': 'Comdirect', 'value': 'CDT'},
-                    {'label': 'ING', 'value': 'ING'}
-                ],
-                value='CDT',
-                className="dcc_control"
+                html.Label('Name of the bank'),
+                dcc.Dropdown(
+                    id='bank-dropdown',
+                    options=[
+                        {'label': 'Comdirect', 'value': 'CDT'},
+                        {'label': 'ING', 'value': 'ING'}
+                    ],
+                    value='CDT',
+                    className="dcc_control"
 
+                ),
+
+                html.Label('Period to be evaluated'),
+                dcc.DatePickerRange(
+                    id='date-picker-range',
+                    start_date=datetime.now() - timedelta(days=365),
+                    end_date=datetime.now(),
+                    display_format='DD.MM.YYYY',
+                    className="dcc_control"),
+                html.Button('Create Plot', id='button')
+
+            ], className="pretty_container four columns"
             ),
-
-            html.Label('Period to be evaluated'),
-            dcc.DatePickerRange(
-                id='date-picker-range',
-                start_date=datetime.now() - timedelta(days=365),
-                end_date=datetime.now(),
-                display_format='DD.MM.YYYY',
-                className="dcc_control"),
-            html.Button('Create Plot', id='button')
-
-        ], className="pretty_container four columns"
+            dcc.Graph(id='bar-plot-monthly', className='pretty_container eight columns', config={
+                'displayModeBar': False
+            })
+        ], className='row flex-display'
         ),
-        dcc.Graph(id='bar-plot-monthly', className='pretty_container eight columns', config={
+
+        # dcc.Graph(id='bar-plot-daily', className='pretty_container six columns', config={
+        #     'displayModeBar': False
+        # }),
+        dcc.Graph(id='custom-graph', className='pretty_container twelve columns', config={
             'displayModeBar': False
-        })
-    ], className='row flex-display'
-    ),
+        }),
+        html.Div(session_id, id='session-id', style={'display': 'none'})
 
-    dcc.Graph(id='bar-plot-daily', className='pretty_container six columns', config={
-        'displayModeBar': False
-    }),
-    dcc.Graph(id='custom-graph', className='pretty_container twelve columns', config={
-        'displayModeBar': False
-    })
+    ])
 
-])
+
+app.layout = serve_layout()
 
 
 @app.callback(
-    dash.dependencies.Output('upload-data', 'children'),
-    [dash.dependencies.Input('upload-data', 'filename')])
+    Output('upload-data', 'children'),
+    [Input('upload-data', 'filename')])
 def file_chosen(filename):
     if filename is not None:
         return html.A(filename)
@@ -82,79 +101,81 @@ def file_chosen(filename):
         return html.Div(['drag and drop or ', html.A('select files')])
 
 
+def get_dataframe(session_id, content, name_bank):
+    @cache.memoize()
+    def load_and_serialize_data(session_id, content, name_bank):
+        content_type, content_string = content.split(',')
+        decoded = base64.b64decode(content_string)
+
+        if name_bank == 'CDT':
+            my_account = ComdirectAccount()
+        else:
+            raise NotImplementedError(str(name_bank) + 'is not Implemented')
+
+        my_account.load_revenue(decoded)
+        my_account.categorize(
+            'categories2.json')  # Todo extend the dash interface so that the categories can be set in it
+        return my_account.revenue.to_json()
+
+    return pd.read_json(load_and_serialize_data(session_id, content, name_bank),
+                        convert_dates=['booking_date', 'value_date'])
+
+
 @app.callback(
-    dash.dependencies.Output('custom-graph', 'figure'),
-    [dash.dependencies.Input('button', 'n_clicks')],
-    [dash.dependencies.State('upload-data', 'filename'),
-     dash.dependencies.State('bank-dropdown', 'value'),
-     dash.dependencies.State('date-picker-range', 'start_date'),
-     dash.dependencies.State('date-picker-range', 'end_date')])
-def create_sankey_plot(n_clicks, filename, name_bank, start_date, stop_date):
-    if any([arg is None for arg in [n_clicks, filename, name_bank, start_date, stop_date]]):
+    Output('custom-graph', 'figure'),
+    [Input('button', 'n_clicks')],
+    [State('session-id', 'children'),
+     State('date-picker-range', 'start_date'),
+     State('date-picker-range', 'end_date'),
+     State('upload-data', 'contents'),
+     State('bank-dropdown', 'value')])
+def create_sankey_plot(n_clicks, session_id, start_date, stop_date, content, name_bank):
+    if any(arg is None for arg in [n_clicks, session_id, start_date, stop_date, content, name_bank]):
         raise PreventUpdate
 
-    if name_bank == 'CDT':
-        my_account = ComdirectAccount()
-    else:
-        raise NotImplementedError(str(name_bank) + 'is not Implemented')
-
-    my_account.load_revenue(filename)
-    my_account.categorize('categories2.json')  # Todo extend the dash interface so that the categories can be set in it
-
-    app.sankeyplot = SankeyPlot(my_account)
+    dataframe = get_dataframe(session_id, content, name_bank)
+    app.sankeyplot = SankeyPlot(dataframe)
     app.sankeyplot.set_date_range(start_date, stop_date)
 
     return app.sankeyplot.fig
 
 
 @app.callback(
-    dash.dependencies.Output('bar-plot-monthly', 'figure'),
-    [dash.dependencies.Input('button', 'n_clicks')],
-    [dash.dependencies.State('upload-data', 'filename'),
-     dash.dependencies.State('bank-dropdown', 'value'),
-     dash.dependencies.State('date-picker-range', 'start_date'),
-     dash.dependencies.State('date-picker-range', 'end_date')])
-def create_bar_plot(n_clicks, filename, name_bank, start_date, stop_date):
-    if any([arg is None for arg in [n_clicks, filename, name_bank, start_date, stop_date]]):
+    Output('bar-plot-monthly', 'figure'),
+    [Input('button', 'n_clicks'),
+     Input('session-id', 'children')],
+    [State('date-picker-range', 'start_date'),
+     State('date-picker-range', 'end_date'),
+     State('upload-data', 'contents'),
+     State('bank-dropdown', 'value')])
+def create_bar_plot(n_clicks, session_id, start_date, stop_date, content, name_bank):
+    if any(arg is None for arg in [n_clicks, session_id, start_date, stop_date, content, name_bank]):
         raise PreventUpdate
 
-    if name_bank == 'CDT':
-        my_account = ComdirectAccount()
-    else:
-        raise NotImplementedError(str(name_bank) + 'is not Implemented')
-
-    my_account.load_revenue(filename)
-    my_account.categorize('categories2.json')  # Todo extend the dash interface so that the categories can be set in it
-
-    app.barplot = BarPlotMonthly(my_account)
+    dataframe = get_dataframe(session_id, content, name_bank)
+    app.barplot = BarPlotMonthly(dataframe)
     app.barplot.set_date_range(start_date, stop_date)
 
     return app.barplot.fig
 
 
-@app.callback(
-    dash.dependencies.Output('bar-plot-daily', 'figure'),
-    [dash.dependencies.Input('button', 'n_clicks')],
-    [dash.dependencies.State('upload-data', 'filename'),
-     dash.dependencies.State('bank-dropdown', 'value'),
-     dash.dependencies.State('date-picker-range', 'start_date'),
-     dash.dependencies.State('date-picker-range', 'end_date')])
-def create_bar_plot_daily(n_clicks, filename, name_bank, start_date, stop_date):
-    if any([arg is None for arg in [n_clicks, filename, name_bank, start_date, stop_date]]):
-        raise PreventUpdate
-
-    if name_bank == 'CDT':
-        my_account = ComdirectAccount()
-    else:
-        raise NotImplementedError(str(name_bank) + 'is not Implemented')
-
-    my_account.load_revenue(filename)
-    my_account.categorize('categories2.json')  # Todo extend the dash interface so that the categories can be set in it
-
-    app.barplot = BarPlotDaily(my_account)
-    app.barplot.set_date_range(start_date, stop_date)
-
-    return app.barplot.fig
+# @app.callback(
+#     Output('bar-plot-daily', 'figure'),
+#     [Input('button', 'n_clicks'),
+#      Input('session-id', 'children')],
+#     [State('date-picker-range', 'start_date'),
+#      State('date-picker-range', 'end_date'),
+#      State('upload-data', 'contents'),
+#      State('bank-dropdown', 'value')])
+# def create_bar_plot_daily(n_clicks, session_id, start_date, stop_date, content, name_bank):
+#     if any(arg is None for arg in [n_clicks, session_id, start_date, stop_date, content, name_bank]):
+#         raise PreventUpdate
+#
+#     dataframe = get_dataframe(session_id, content, name_bank)
+#     app.barplot = BarPlotDaily(dataframe)
+#     app.barplot.set_date_range(start_date, stop_date)
+#
+#     return app.barplot.fig
 
 
 def open_browser():

@@ -1,5 +1,4 @@
 import plotly.graph_objects as go
-import plotly.express as px
 
 
 class BasePlot:
@@ -9,8 +8,8 @@ class BasePlot:
 
 
 class SankeyPlot(BasePlot):
-    def __init__(self, account, start_date=None, stop_date=None, focus=None, depth_level=None):
-        self.account = account
+    def __init__(self, dataframe, start_date=None, stop_date=None, focus=None, depth_level=None):
+        self.dataframe = dataframe
         self.label = []
         self.source = []
         self.target = []
@@ -24,10 +23,10 @@ class SankeyPlot(BasePlot):
 
     def _create_grouped_df(self):
         if self.start_date is not None and self.stop_date is not None:
-            period_df = self.account.revenue[(self.account.revenue.booking_date > self.start_date) & (
-                    self.account.revenue.booking_date < self.stop_date)]
+            period_df = self.dataframe[(self.dataframe.booking_date > self.start_date) & (
+                    self.dataframe.booking_date < self.stop_date)]
         else:
-            period_df = self.account.revenue.copy()
+            period_df = self.dataframe.copy()
 
         timeperiod_month = (period_df.booking_date.iloc[0] - period_df.booking_date.iloc[-1]).days / 30.436875
         sum_by_category = period_df[['category', 'turnover']].groupby('category').sum()
@@ -96,8 +95,8 @@ class SankeyPlot(BasePlot):
 
 
 class BarPlotMonthly(BasePlot):
-    def __init__(self, account):
-        self.account = account
+    def __init__(self, dataframe):
+        self.dataframe = dataframe
         self.label = []
         self.source = []
         self.target = []
@@ -108,10 +107,10 @@ class BarPlotMonthly(BasePlot):
     @property
     def fig(self):
         if self.start_date is not None and self.stop_date is not None:
-            df = self.account.revenue[(self.account.revenue.booking_date > self.start_date) & (
-                    self.account.revenue.booking_date < self.stop_date)]
+            df = self.dataframe[(self.dataframe.booking_date > self.start_date) & (
+                    self.dataframe.booking_date < self.stop_date)]
         else:
-            df = self.account.revenue.copy()
+            df = self.dataframe.copy()
 
         df.loc[df.turnover >= 0, 'income'] = df.turnover
         df.loc[df.turnover < 0, 'expense'] = abs(df.turnover)
@@ -128,8 +127,8 @@ class BarPlotMonthly(BasePlot):
 
 
 class BarPlotDaily(BasePlot):
-    def __init__(self, account):
-        self.account = account
+    def __init__(self, dataframe):
+        self.dataframe = dataframe
         self.label = []
         self.source = []
         self.target = []
@@ -139,10 +138,10 @@ class BarPlotDaily(BasePlot):
     @property
     def fig(self):
         if self.start_date is not None and self.stop_date is not None:
-            df = self.account.revenue[(self.account.revenue.booking_date > self.start_date) & (
-                    self.account.revenue.booking_date < self.stop_date)]
+            df = self.dataframe[(self.dataframe.booking_date > self.start_date) & (
+                    self.dataframe.booking_date < self.stop_date)]
         else:
-            df = self.account.revenue.copy()
+            df = self.dataframe.copy()
 
         df.loc[df.turnover < 0, 'expense'] = abs(df.turnover)
         df = df.groupby(df['booking_date'].dt.weekday).mean()

@@ -1,7 +1,9 @@
-import pandas as pd
-import numpy as np
+import io
 import json
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
 
 
 class Account:  # Todo make it possible to merge multiple accounts (checking account, credit card, Paypal) for better categorization
@@ -51,7 +53,8 @@ class ComdirectAccount(Account):
                       'turnover': self._convert_turnover}
         kwargs = {'skiprows': 4, 'skipfooter': 2, 'sep': ';', 'encoding': 'cp1252', 'header': 0, 'usecols': usecols,
                   'names': names, 'engine': 'python', 'converters': converters}
-        self.revenue = pd.read_csv(revenue_file, **kwargs)
+        revenue_file = revenue_file.decode('cp1252')
+        self.revenue = pd.read_csv(io.StringIO(revenue_file), **kwargs)
 
 
 class INGAccount(Account): #  Todo add load_revenue method for INGAccount
