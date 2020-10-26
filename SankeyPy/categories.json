@@ -1,89 +1,96 @@
 {
   "Car:Fuel": [
-    "Aral",
-    "Bp"
+    {"client": "ARAL AG"}
   ],
   "Car:Tickets": [
-    "Ordnungsamt",
-    "Bundeskasse"
+    {"recipient": "Ordnungsamt"}
   ],
-  "Lifestyle:Netflix": [
-    "Netflix"
+  "Car:Insurance": [
+    {"client": "HUK-Coburg"}
   ],
-  "Lifestyle:Spotify": [
-    "Spotify"
+  "Car:Taxes": [
+    {"client": "Bundeskasse"}
+  ],
+  "Lifestyle:Media": [
+    {"client": "Netflix"},
+    {"booking_text": "Spotify"},
+    {"client": "Rundfunk"}
   ],
   "Housing:Apartment Rent": [
-    "Miete"
+    {"booking_text": "Miete"}
   ],
   "Housing:Internet": [
-    "Unitymedia"
+    {"client":  "Unitymedia"}
   ],
   "Housing:Furniture": [
-    "Porta",
-    "Ikea"
-  ],
-  "Housing:Radio Fee": [
-    "Rundfunk"
+    {"booking_text": "Moebel"},
+    {"client":  "Porta"},
+    {"client":  "Ikea"}
   ],
   "Housing:Gas, Water & Electricity": [
-    "Stadtwerke",
-    "E.ON Energie"
+    {"client": "Stadtwerke"},
+    {"client":  "E.ON Energie"}
   ],
   "Insurances": [
-    "Versicherung",
-    "Krankenkasse",
-    "DEVK"
+    {"client":  "Versicherung"},
+    {"booking_text":  "Versicherung"},
+    {"client":  "DEVK"},
+    {"client": "Krankenkasse"}
   ],
   "Lifestyle:Vacation": [
-    "Urlaub"
+    {"booking_text":  "Urlaub"}
   ],
   "Lifestyle:Shopping": [
-    "Amazon",
-    "Otto GmbH",
-    "Kik Textilien",
-    "Paypal",
-    "Saturn",
-    "Media Markt"
+    {"client":  "Amazon"},
+    {"client": "Otto GmbH"},
+    {"booking_text":  "Otto GmbH"},
+    {"client":  "Kik Textilien"},
+    {"client":  "Saturn"},
+    {"client": "Media Markt"},
+    {"booking_text": "Adidas"}
   ],
   "Salary": [
-    "Lohn",
-    "Gehalt"
-  ],
+    {"booking_text": "Lohn"},
+    {"booking_text":  "Gehalt"}
+],
   "Lifestyle:Cash": [
-    "Geldautomat",
-    "Auszahlung",
-    "Bargeldeinzahlung"
+    {"client": "Geldautomat"},
+    {"booking_text": "Auszahlung"},
+    {"booking_text": "Einzahlung"}
   ],
   "Lifestyle:Groceries": [
-    "Lidl",
-    "Edeka",
-    "Rewe",
-    "Aldi",
-    "Tegut"
+    {"client": "Lidl"},
+    {"client": "Edeka"},
+    {"client": "Rewe"},
+    {"client": "Aldi"},
+    {"client": "Tegut"}
   ],
   "Lifestyle:Dining": [
-    "Restaurant",
-    "Pizzeria"
+    {"client": "Restaurant"},
+    {"booking_text": "Restaurant"},
+    {"booking_text": "Pizzeria"},
+    {"booking_text":  "Takeaway"}
   ],
   "Lifestyle:Phone Bill": [
-    "Telefonica",
-    "Drillisch"
+    {"client": "Telefonica"},
+    {"client": "Drillisch"}
   ],
   "Savings": [
-    "WPKNR",
-    "Traderepublic",
-    "Wertpapierkauf"
+    {"booking_text": "WPKNR"},
+    {"booking_text": "Wertpapierkauf"},
+    {"procedure":  "Wertpapiere"}
   ],
   "Lifestyle:Hobby": [
-    "McFit"
+    {"booking_text": "McFit"},
+    {"booking_text": "myprotein"},
+    {"booking_text": "playstation"}
   ],
   "Lifestyle:Credit Card": [
-    "Visa",
-    "Mastercard"
+    {"client": "Visa"},
+    {"client": "Mastercard"}
   ],
   "Lifestyle:Drugstore": [
-    "Rossmann",
-    "Drogerie"
+    {"client": "Rossmann"},
+    {"client": "DM Drogeriemarkt"}
   ]
 }
