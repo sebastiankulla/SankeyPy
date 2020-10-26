@@ -46,7 +46,7 @@ class ComdirectAccount(Account):
     def _convert_turnover(self, string):
         return np.float(string.replace('.', '').replace(',', '.'))
 
-    def load_revenue(self, revenue_file):  # Todo Try to seperate the client from column booking_text, add new column for client
+    def load_revenue(self, revenue_file):
         usecols = [0, 1, 2, 3, 4]
         names = ['booking_date', 'value_date', 'procedure', 'booking_text', 'turnover']
         converters = {'booking_date': self._convert_dates, 'value_date': self._convert_dates,
@@ -55,6 +55,10 @@ class ComdirectAccount(Account):
                   'names': names, 'engine': 'python', 'converters': converters}
         revenue_file = revenue_file.decode('cp1252')
         self.revenue = pd.read_csv(io.StringIO(revenue_file), **kwargs)
+        self.revenue['client'] = [result[0] if len(result) > 0 else "" for result in self.revenue['booking_text'].str.findall('(?<=Auftraggeber: ).+(?= Buchungstext:)') ]
+        self.revenue['ref_number'] = [result[0] if len(result) > 0 else "" for result in
+                                  self.revenue['booking_text'].str.findall('(?<=Ref. ).+')]
+        self.revenue['booking_text'] = [result[0] if len(result) > 0 else "" for result in self.revenue['booking_text'].str.findall('(?<=Buchungstext: ).+(?= Ref.)') ]
 
 
 class INGAccount(Account): #  Todo add load_revenue method for INGAccount
